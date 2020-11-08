@@ -531,8 +531,9 @@ def get_objects_for_user(user, perms, klass=None, use_groups=True, any_perm=Fals
     else:
         queryset = _get_queryset(klass)
         if ctype.model_class() != queryset.model:
-            raise MixedContentTypeError("Content type for given perms and "
-                                        "klass differs")
+            if not issubclass(queryset.model, ctype.model_class()) or not queryset.model._meta.proxy:
+                raise MixedContentTypeError("Content type for given perms and "
+                                            "klass differs")
 
     # At this point, we should have both ctype and queryset and they should
     # match which means: ctype.model_class() == queryset.model
